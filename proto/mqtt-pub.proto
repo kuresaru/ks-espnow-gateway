@@ -1,0 +1,13 @@
+syntax = "proto2";
+
+message KegMqttPubItem
+{
+    required string topic = 1;
+    required string payload = 2;
+    required bool retain = 3;
+}
+
+message KegMqttPub
+{
+    repeated KegMqttPubItem item = 1;
+}

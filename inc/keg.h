@@ -6,18 +6,26 @@
 #define KS_ESPNOW_GATEWAY_KEG_H
 
 #include <stdint.h>
+#include <protobuf-c/protobuf-c.h>
+
+#define KEG_TRX_TYPE_DATA 0x02
+#define KEG_TRX_TYPE_ACK 0x03
+#define KEG_TRX_TYPE_MQTT_PUB 0x04
 
 typedef struct {
+    uint32_t seq;
     uint8_t type;
-    uint8_t reserved[3];
+    uint8_t len;
     uint8_t data[];
-} keg_raw_pkt_t;
+} __attribute__((__packed__)) keg_pkt_t;
 
-void generate_dhparam(uint8_t *dh_prime);
+void mqtt_start();
+void mqtt_process_request(uint8_t *data, uint8_t len);
 
-void load_dhparam(uint8_t *dh_prime);
+        void encrypt_aes(const uint8_t *key, const uint8_t *in, int in_len, uint8_t *out, int *out_len);
+void decrypt_aes(const uint8_t *key, const uint8_t *in, int in_len, uint8_t *out, int *out_len);
+void calculate_md5(uint8_t *md5, const uint8_t *key, const uint8_t *data, int len);
 
-void dh_get_and_exchange(uint8_t **serverkey_buf, uint32_t *serverkey_len, uint8_t **exkey_buf, uint32_t *exkey_len,
-                         const uint8_t *clientkey, uint32_t clientkey_len);
+_Noreturn void transport_start(char *device_name);
 
 #endif //KS_ESPNOW_GATEWAY_KEG_H

@@ -3,7 +3,6 @@
 //
 
 #include "keg.h"
-#include <assert.h>
 #include <stdio.h>
 #include <unistd.h>
 
@@ -42,27 +41,6 @@ static void parse_args(int argc, char *argv[]) {
     }
 }
 
-static void load_encrypt() {
-    redisReply *reply;
-    reply = redisCommand(rds_ctx, "GET keg:encrypt:dh_prime");
-    if ((reply->type != REDIS_REPLY_STRING) || (reply->len != 128)) {
-        freeReplyObject(reply);
-        uint8_t *dh_prime = malloc(128);
-        assert(dh_prime != NULL);
-        printf("generating dhparam\n");
-        generate_dhparam(dh_prime);
-        reply = redisCommand(rds_ctx, "SET keg:encrypt:dh_prime %b", dh_prime, 128);
-        free(dh_prime);
-        assert_rds(reply, "redis save dhparam error");
-        freeReplyObject(reply);
-        printf("generate dhparam done\n");
-    } else {
-        load_dhparam(reply->str);
-        freeReplyObject(reply);
-        printf("load dhparam from redis\n");
-    }
-}
-
 int main(int argc, char *argv[]) {
     parse_args(argc, argv);
     printf("start options: device_name=%s rds=%s@%s:%s\n",
@@ -89,6 +67,7 @@ int main(int argc, char *argv[]) {
     assert_rds(reply, "select db failed");
     freeReplyObject(reply);
 
-    load_encrypt();
-    return 0;
+    mqtt_start();
+    transport_start(device_name);
+//    return 0;
 }
