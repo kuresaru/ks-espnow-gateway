@@ -1,0 +1,16 @@
+[Unit]
+After=network.target redis-server.service
+
+[Service]
+ExecStart=/root/ks-espnow-gateway/start.sh
+WorkingDirectory=/root/ks-espnow-gateway/
+Type=simple
+User=root
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ks-espnow-gateway
+Restart=on-failure
+RestartSec=2
+
+[Install]
+WantedBy=multi-user.target
