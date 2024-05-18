@@ -93,12 +93,13 @@ _Noreturn static void *mqtt_process(void *param) {
         } else {
             usleep(10000);
         }
+        mosquitto_loop(mosq, 0, 1);
     }
 }
 
 void mqtt_start() {
     mosquitto_lib_init();
-    mosq = mosquitto_new(NULL, true, NULL);
+    mosq = mosquitto_new("ks-espnow-gateway", true, NULL);
     if (mosquitto_connect(mosq, "127.0.0.1", 1883, 60)) {
         printf("failed to connect mqtt\n");
     }
